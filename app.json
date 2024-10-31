@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "livingword",
+    "name": "Living Word",
     "slug": "livingword",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -24,11 +24,9 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/adaptive-icon.png"
     },
-    "plugins": [
-      "expo-router"
-    ],
+    "plugins": ["expo-router"],
     "experiments": {
       "typedRoutes": true
     }

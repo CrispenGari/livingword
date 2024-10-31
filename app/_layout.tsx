@@ -1,37 +1,124 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
+import { Tabs, useRouter } from "expo-router";
+import { useFonts } from "expo-font";
+import * as SplashScreen from "expo-splash-screen";
+import React from "react";
+import { COLORS, FONTS, Fonts } from "@/constants";
+import { LogBox, Platform } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { StatusBar } from "expo-status-bar";
+import AllHeader from "@/components/Headers/All";
+import OldHeader from "@/components/Headers/Old";
+import NewHeader from "@/components/Headers/New";
 
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
+LogBox.ignoreLogs;
+LogBox.ignoreAllLogs();
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
-
-  useEffect(() => {
-    if (loaded) {
+const InitialLayout = () => {
+  const [loaded, error] = useFonts(Fonts);
+  React.useEffect(() => {
+    if (loaded || error) {
       SplashScreen.hideAsync();
     }
-  }, [loaded]);
-
-  if (!loaded) {
+  }, [loaded, error]);
+  if (!loaded && !error) {
     return null;
   }
+  return (
+    <GestureHandlerRootView>
+      <BottomSheetModalProvider>
+        <RootLayout />
+      </BottomSheetModalProvider>
+    </GestureHandlerRootView>
+  );
+};
+
+export default InitialLayout;
+const RootLayout = () => {
+  const width = 350;
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-    </ThemeProvider>
+    <>
+      <StatusBar backgroundColor={COLORS.main} animated={false} />
+      <Tabs
+        initialRouteName="index"
+        screenOptions={{
+          tabBarStyle: {
+            height:
+              width >= 600 ? 70 : Platform.select({ ios: 100, android: 80 }),
+            backgroundColor: COLORS.main,
+            position: "absolute",
+            elevation: 0,
+            borderWidth: 0,
+            shadowOpacity: 0,
+          },
+          tabBarHideOnKeyboard: true,
+          tabBarActiveTintColor: COLORS.tertiary,
+          tabBarInactiveTintColor: COLORS.secondary,
+          tabBarLabelStyle: {
+            fontFamily: FONTS.bold,
+            marginTop: width >= 600 ? 10 : -10,
+            marginBottom: 10,
+            fontSize: 20,
+          },
+        }}
+      >
+        <Tabs.Screen
+          name="index"
+          options={{
+            title: "All",
+            header: () => <AllHeader />,
+            tabBarIcon: ({ color, size }) => (
+              <MaterialIcons name="menu-book" size={size} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="old"
+          options={{
+            header: () => <OldHeader />,
+            title: "Old Testament",
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="book" color={color} size={size} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="new"
+          options={{
+            title: "New Testament",
+            header: () => <NewHeader />,
+            headerStyle: {
+              height: Platform.select({ ios: 100, android: 150 }),
+              backgroundColor: COLORS.primary,
+            },
+            headerTitleStyle: {
+              fontFamily: FONTS.bold,
+            },
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="book-outline" color={color} size={size} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="(book)"
+          options={{
+            href: null,
+            tabBarStyle: { display: "none" },
+            headerShown: false,
+          }}
+        />
+        <Tabs.Screen
+          name="(settings)"
+          options={{
+            href: null,
+            tabBarStyle: { display: "none" },
+            headerShown: false,
+          }}
+        />
+      </Tabs>
+    </>
   );
-}
+};
