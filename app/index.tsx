@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
     width: "100%",
     padding: 10,
     fontFamily: FONTS.bold,
-    fontSize: 30,
+    fontSize: 20,
     textAlign: "center",
   },
 });

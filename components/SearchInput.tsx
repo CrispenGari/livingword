@@ -9,6 +9,8 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { COLORS, FONTS } from "@/constants";
+import { onImpact } from "@/utils";
+import { useSettingsStore } from "@/store/useSettingsStore";
 
 interface Props {
   onChangeText: (text: string) => void;
@@ -16,6 +18,7 @@ interface Props {
   placeholder: string;
 }
 const SearchInput = ({ onChangeText, text, placeholder }: Props) => {
+  const { settings } = useSettingsStore();
   const scale = useSharedValue(0);
   const startZoomIn = React.useCallback(() => {
     scale.value = withTiming(1, { duration: 1000 });
@@ -71,7 +74,6 @@ const SearchInput = ({ onChangeText, text, placeholder }: Props) => {
         style={{
           flex: 1,
           fontFamily: FONTS.regular,
-          fontSize: 25,
           paddingHorizontal: 10,
         }}
         placeholderTextColor={COLORS.black}
@@ -84,6 +86,9 @@ const SearchInput = ({ onChangeText, text, placeholder }: Props) => {
       />
       <TouchableOpacity
         onPress={async () => {
+          if (settings.haptics) {
+            await onImpact();
+          }
           onChangeText("");
           Keyboard.dismiss();
           textInputRef.current?.blur();

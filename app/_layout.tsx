@@ -61,7 +61,6 @@ const RootLayout = () => {
             fontFamily: FONTS.bold,
             marginTop: width >= 600 ? 10 : -10,
             marginBottom: 10,
-            fontSize: 20,
           },
         }}
       >

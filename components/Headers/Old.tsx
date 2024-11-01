@@ -10,9 +10,14 @@ import { COLORS, FONTS } from "@/constants";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import SearchInput from "../SearchInput";
 import { Ionicons } from "@expo/vector-icons";
+import { onImpact } from "@/utils";
+import { useSettingsStore } from "@/store/useSettingsStore";
+import { useRouter } from "expo-router";
 
 const OldHeader = () => {
   const { top } = useSafeAreaInsets();
+  const { settings } = useSettingsStore();
+  const router = useRouter();
   return (
     <SafeAreaView
       style={{
@@ -36,10 +41,25 @@ const OldHeader = () => {
             alignItems: "center",
           }}
         >
-          <Text style={{ fontFamily: FONTS.bold, fontSize: 30 }}>
+          <Text style={{ fontFamily: FONTS.bold, fontSize: 20 }}>
             Living Word Bible
           </Text>
-          <TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              width: 35,
+              height: 35,
+              backgroundColor: COLORS.main,
+              borderRadius: 35,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+            onPress={async () => {
+              if (settings.haptics) {
+                await onImpact();
+              }
+              router.push("/(settings)/settings");
+            }}
+          >
             <Ionicons
               name="settings-outline"
               size={25}

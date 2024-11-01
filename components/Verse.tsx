@@ -20,9 +20,7 @@ const Verse = ({
         paddingHorizontal: 10,
       }}
     >
-      <Text style={{ fontFamily: FONTS.regular, fontSize: 20, lineHeight: 30 }}>
-        {verseNumber}.
-      </Text>
+      <Text style={{ fontFamily: FONTS.regular }}>{verseNumber}.</Text>
       <View
         style={{
           flexDirection: "row",
@@ -33,9 +31,8 @@ const Verse = ({
         <Text
           style={{
             fontFamily: FONTS.bold,
-            fontSize: 25,
+
             flexWrap: "wrap",
-            lineHeight: 30,
           }}
         >
           {firstChar}
@@ -43,9 +40,8 @@ const Verse = ({
         <Text
           style={{
             fontFamily: FONTS.regular,
-            fontSize: 25,
+
             flex: 1,
-            lineHeight: 30,
           }}
         >
           {rest}

@@ -16,13 +16,19 @@ export const COLORS = {
 };
 
 export const Fonts = {
-  DongleBold: require("@/assets/fonts/Dongle-Bold.ttf"),
-  DongleRegular: require("@/assets/fonts/Dongle-Regular.ttf"),
-  DongleLight: require("@/assets/fonts/Dongle-Light.ttf"),
+  GentiumPlusBold: require("@/assets/fonts/GentiumPlus-Bold.ttf"),
+  GentiumPlusRegular: require("@/assets/fonts/GentiumPlus-Regular.ttf"),
+  GentiumPlusItalic: require("@/assets/fonts/GentiumPlus-Italic.ttf"),
+  GentiumPlusBoldItalic: require("@/assets/fonts/GentiumPlus-BoldItalic.ttf"),
 };
 
 export const FONTS = {
-  regular: "DongleRegular",
-  bold: "DongleBold",
-  light: "DongleLight",
+  regular: "GentiumPlusRegular",
+  bold: "GentiumPlusBold",
+  italic: "GentiumPlusItalic",
+  boldItalic: "GentiumPlusBoldItalic",
+};
+
+export const STORAGE_NAMES = {
+  SETTINGS: "living-word:settings",
 };

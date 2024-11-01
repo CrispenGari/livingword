@@ -4,11 +4,14 @@ import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { BIBLE, COLORS, FONTS } from "@/constants";
 import Chapter from "@/components/Chapter";
 import { Ionicons } from "@expo/vector-icons";
+import { onImpact } from "@/utils";
+import { useSettingsStore } from "@/store/useSettingsStore";
 
 const Page = () => {
   const router = useRouter();
   const { book: abbrev } = useLocalSearchParams<{ book: string }>();
   const book = BIBLE.find((b) => b.abbrev === abbrev)!;
+  const { settings } = useSettingsStore();
 
   return (
     <>
@@ -17,10 +20,10 @@ const Page = () => {
           headerStyle: {
             backgroundColor: COLORS.main,
           },
-          headerTitle: book.name.toUpperCase(),
+          headerTitle: book.name,
           headerTitleStyle: {
             fontFamily: FONTS.bold,
-            fontSize: 30,
+            fontSize: 20,
           },
           headerShadowVisible: false,
           headerLeft: () => (
@@ -31,20 +34,14 @@ const Page = () => {
                 alignItems: "center",
                 gap: 5,
               }}
-              onPress={() => {
+              onPress={async () => {
+                if (settings.haptics) {
+                  await onImpact();
+                }
                 router.replace("/");
               }}
             >
               <Ionicons name="arrow-back" size={20} color={COLORS.tertiary} />
-              <Text
-                style={{
-                  fontFamily: FONTS.bold,
-                  fontSize: 25,
-                  color: COLORS.tertiary,
-                }}
-              >
-                ALL
-              </Text>
             </TouchableOpacity>
           ),
         }}

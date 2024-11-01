@@ -2,6 +2,8 @@ import { Text, TouchableOpacity } from "react-native";
 import React from "react";
 import { COLORS, FONTS } from "@/constants";
 import { useRouter } from "expo-router";
+import { useSettingsStore } from "@/store/useSettingsStore";
+import { onImpact } from "@/utils";
 
 const Chapter = ({
   chapterNumber,
@@ -15,6 +17,7 @@ const Chapter = ({
   book: string;
 }) => {
   const router = useRouter();
+  const { settings } = useSettingsStore();
   return (
     <TouchableOpacity
       style={{
@@ -26,7 +29,10 @@ const Chapter = ({
         borderRadius: 5,
         marginBottom: 2,
       }}
-      onPress={() => {
+      onPress={async () => {
+        if (settings.haptics) {
+          await onImpact();
+        }
         router.push({
           pathname: "/(book)/chapter",
           params: {
@@ -42,7 +48,6 @@ const Chapter = ({
       <Text
         style={{
           fontFamily: FONTS.bold,
-          fontSize: 25,
         }}
       >
         Chapter {chapterNumber}
@@ -50,7 +55,7 @@ const Chapter = ({
       <Text
         style={{
           fontFamily: FONTS.regular,
-          fontSize: 20,
+
           color: COLORS.gray,
         }}
       >

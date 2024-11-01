@@ -4,6 +4,8 @@ import { TBibleBook } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS, FONTS } from "@/constants";
 import { useRouter } from "expo-router";
+import { useSettingsStore } from "@/store/useSettingsStore";
+import { onImpact } from "@/utils";
 
 const Book = ({
   book,
@@ -13,6 +15,7 @@ const Book = ({
   testament: "old" | "new";
 }) => {
   const router = useRouter();
+  const { settings } = useSettingsStore();
   return (
     <TouchableOpacity
       style={{
@@ -21,7 +24,10 @@ const Book = ({
         justifyContent: "space-between",
         alignItems: "center",
       }}
-      onPress={() => {
+      onPress={async () => {
+        if (settings.haptics) {
+          await onImpact();
+        }
         router.navigate({
           pathname: "/(book)/[book]",
           params: {
@@ -31,12 +37,10 @@ const Book = ({
       }}
     >
       <View style={{ flex: 1 }}>
-        <Text style={{ fontFamily: FONTS.bold, fontSize: 25 }}>
+        <Text style={{ fontFamily: FONTS.bold, fontSize: 20 }}>
           {book.name}
         </Text>
-        <Text
-          style={{ fontFamily: FONTS.light, fontSize: 18, color: COLORS.gray }}
-        >
+        <Text style={{ fontFamily: FONTS.regular, color: COLORS.gray }}>
           {book.chapters.length} Chapters
         </Text>
       </View>
