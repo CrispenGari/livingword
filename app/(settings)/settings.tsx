@@ -1,5 +1,4 @@
 import {
-  View,
   Text,
   ScrollView,
   Alert,
@@ -20,10 +19,24 @@ import Card from "@/components/Card";
 import SettingsItem from "@/components/SettingsItem";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import AboutBottomSheet from "@/components/BottomSheets/AboutBottomSheet";
+import FontSettingsBottomSheet from "@/components/BottomSheets/FontSettingsBottomSheet";
+import ReadingThemeSettingsBottomSheet from "@/components/BottomSheets/ReadingThemeSettingsBottomSheet";
+import ReadingKeepAwakeBottomSheet from "@/components/BottomSheets/ReadingKeepAwakeBottomSheet";
+import ReadingBrightnessSettingsBottomSheet from "@/components/BottomSheets/ReadingBrightnessSettingsBottomSheet";
+import { useReaderLaterStore } from "@/store/useReadLaterStore";
+import { useFavoritesVersesStore } from "@/store/useFavoritesVersesStore";
+import { useReadChapterHistoryStore } from "@/store/useReadChapterHistoryStore";
 
 const Page = () => {
   const { settings, update, restore: restoreSettings } = useSettingsStore();
+  const { clear: clearReadLater } = useReaderLaterStore();
+  const { clear: clearFavVerses } = useFavoritesVersesStore();
+  const { clear: clearReadChapters } = useReadChapterHistoryStore();
   const aboutBottomSheetRef = React.useRef<BottomSheetModal>(null);
+  const fontSettingsBottomSheetRef = React.useRef<BottomSheetModal>(null);
+  const keepAwakeSettingsBottomSheetRef = React.useRef<BottomSheetModal>(null);
+  const themeSettingsBottomSheetRef = React.useRef<BottomSheetModal>(null);
+  const brightnessSettingsBottomSheetRef = React.useRef<BottomSheetModal>(null);
 
   return (
     <>
@@ -58,6 +71,12 @@ const Page = () => {
       />
 
       <AboutBottomSheet ref={aboutBottomSheetRef} />
+      <FontSettingsBottomSheet ref={fontSettingsBottomSheetRef} />
+      <ReadingThemeSettingsBottomSheet ref={themeSettingsBottomSheetRef} />
+      <ReadingKeepAwakeBottomSheet ref={keepAwakeSettingsBottomSheetRef} />
+      <ReadingBrightnessSettingsBottomSheet
+        ref={brightnessSettingsBottomSheetRef}
+      />
       <ScrollView
         style={{ flex: 1, backgroundColor: COLORS.main }}
         contentContainerStyle={{
@@ -113,8 +132,12 @@ const Page = () => {
                     text: "Yes",
                     onPress: async () => {
                       if (settings.haptics) {
-                        restoreSettings();
+                        onImpact();
                       }
+                      restoreSettings();
+                      clearReadLater();
+                      clearFavVerses();
+                      clearReadChapters();
                     },
                     style: "default",
                   },
@@ -143,8 +166,10 @@ const Page = () => {
         <Text style={styles.headerText}>User Reading Preference</Text>
         <Card>
           <SettingsItem
-            subtitle="Adjust Page fontsize to your preference."
-            onPress={() => {}}
+            subtitle="Adjust Page fontsize, style and weight of Fonts to your preference."
+            onPress={() => {
+              fontSettingsBottomSheetRef.current?.present();
+            }}
             title="Reading Font"
             Icon={
               <Ionicons name="text-outline" size={18} color={COLORS.black} />
@@ -152,7 +177,7 @@ const Page = () => {
           />
           <SettingsItem
             subtitle="Adjust Page reading theme."
-            onPress={() => {}}
+            onPress={() => themeSettingsBottomSheetRef.current?.present()}
             title="Reading Theme"
             Icon={
               <Ionicons
@@ -163,16 +188,20 @@ const Page = () => {
             }
           />
           <SettingsItem
-            subtitle="Adjust Page reading rightness."
-            onPress={() => {}}
+            subtitle="Adjust Page reading Brightness."
+            onPress={() => brightnessSettingsBottomSheetRef.current?.present()}
             title="Reading Brightness"
             Icon={
               <Ionicons name="sunny-outline" size={18} color={COLORS.black} />
             }
           />
           <SettingsItem
-            subtitle="Keep awake mode OFF."
-            onPress={() => {}}
+            subtitle={
+              settings.keepAwake
+                ? "Keep awake mode ONN."
+                : "Keep awake mode OFF."
+            }
+            onPress={() => keepAwakeSettingsBottomSheetRef.current?.present()}
             title="Keep Awake"
             Icon={
               <Ionicons name="eye-outline" size={18} color={COLORS.black} />

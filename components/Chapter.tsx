@@ -5,7 +5,7 @@ import { useRouter } from "expo-router";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { onImpact } from "@/utils";
 import { Ionicons } from "@expo/vector-icons";
-import { useReadChapterHistory } from "@/store/useReadChapterHistory";
+import { useReadChapterHistoryStore } from "@/store/useReadChapterHistoryStore";
 
 const Chapter = ({
   chapterNumber,
@@ -22,7 +22,7 @@ const Chapter = ({
 }) => {
   const router = useRouter();
   const { settings } = useSettingsStore();
-  const { chapters: completed } = useReadChapterHistory();
+  const { chapters: completed } = useReadChapterHistoryStore();
   const [read, setRead] = React.useState(false);
 
   React.useEffect(() => {

@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import { COLORS, FONTS } from "@/constants";
 import {
@@ -10,7 +10,7 @@ import {
 
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { onImpact } from "@/utils";
-import { useFavoritesVerses } from "@/store/useFavoritesVerses";
+import { useFavoritesVersesStore } from "@/store/useFavoritesVersesStore";
 import { TVerse } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -22,7 +22,7 @@ const VerseOptionsBottomSheet = React.forwardRef<BottomSheetModal, Props>(
     const snapPoints = React.useMemo(() => ["30%"], []);
     const { settings } = useSettingsStore();
     const [favored, setFavored] = React.useState(false);
-    const { verses, add, remove } = useFavoritesVerses();
+    const { verses, add, remove } = useFavoritesVersesStore();
     const { dismiss } = useBottomSheetModal();
 
     const addToFavorites = async () => {
@@ -35,7 +35,7 @@ const VerseOptionsBottomSheet = React.forwardRef<BottomSheetModal, Props>(
       });
       dismiss();
     };
-    const removeToFavorites = async () => {
+    const removeFromFavorites = async () => {
       if (settings.haptics) await onImpact();
       remove({
         abbr: verse.abbr,
@@ -174,7 +174,7 @@ const VerseOptionsBottomSheet = React.forwardRef<BottomSheetModal, Props>(
             </TouchableOpacity>
           ) : (
             <TouchableOpacity
-              onPress={removeToFavorites}
+              onPress={removeFromFavorites}
               style={{
                 width: "100%",
                 gap: 10,
@@ -204,19 +204,3 @@ const VerseOptionsBottomSheet = React.forwardRef<BottomSheetModal, Props>(
 );
 
 export default VerseOptionsBottomSheet;
-
-const styles = StyleSheet.create({
-  item: {
-    minWidth: 60,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: COLORS.tertiary,
-    alignItems: "center",
-    padding: 3,
-    borderRadius: 5,
-    flex: 1,
-    maxWidth: 80,
-  },
-  item_text: {
-    fontFamily: FONTS.bold,
-  },
-});

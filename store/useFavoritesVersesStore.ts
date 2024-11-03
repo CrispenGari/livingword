@@ -11,7 +11,7 @@ interface TState {
   clear: () => void;
 }
 
-export const useFavoritesVerses = create<TState>()(
+export const useFavoritesVersesStore = create<TState>()(
   persist(
     (set, _get) => ({
       verses: [],

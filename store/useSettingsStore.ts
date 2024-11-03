@@ -18,6 +18,8 @@ const initialSettings = {
   theme: "light",
   brightness: 0.5,
   keepAwake: false,
+  fontStyle: "normalStyle",
+  fontWeight: "normalWeight",
 } satisfies TSettings;
 
 export const useSettingsStore = create<TSettingsState>()(

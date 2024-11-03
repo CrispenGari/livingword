@@ -11,6 +11,9 @@ import { StatusBar } from "expo-status-bar";
 import AllHeader from "@/components/Headers/All";
 import OldHeader from "@/components/Headers/Old";
 import NewHeader from "@/components/Headers/New";
+import { useBrightnessPermission } from "@/hooks";
+import { useSettingsStore } from "@/store/useSettingsStore";
+import * as Brightness from "expo-brightness";
 
 LogBox.ignoreLogs;
 LogBox.ignoreAllLogs();
@@ -38,7 +41,20 @@ const InitialLayout = () => {
 export default InitialLayout;
 const RootLayout = () => {
   const width = 350;
+  const { granted } = useBrightnessPermission();
+  const { update, settings } = useSettingsStore();
 
+  React.useEffect(() => {
+    (async () => {
+      if (granted) {
+        const brightness = await Brightness.getBrightnessAsync();
+        update({
+          ...settings,
+          brightness,
+        });
+      }
+    })();
+  }, [granted]);
   return (
     <>
       <StatusBar backgroundColor={COLORS.main} animated={false} />

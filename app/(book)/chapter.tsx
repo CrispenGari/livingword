@@ -9,7 +9,8 @@ import { useSettingsStore } from "@/store/useSettingsStore";
 import { onImpact } from "@/utils";
 import ChapterOptionsBottomSheet from "@/components/BottomSheets/ChapterOptionsBottomSheet";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import { useReadChapterHistory } from "@/store/useReadChapterHistory";
+import { useReadChapterHistoryStore } from "@/store/useReadChapterHistoryStore";
+import { StatusBar } from "expo-status-bar";
 
 type TChapter = {
   verses: string[];
@@ -24,7 +25,7 @@ const Page = () => {
   const chapterBottomSheetRef = React.useRef<BottomSheetModal>(null);
   const [read, setRead] = React.useState(false);
   const { add: markChapterAsRead, chapters: completed } =
-    useReadChapterHistory();
+    useReadChapterHistoryStore();
 
   React.useEffect(() => {
     const found = !!completed.find(
@@ -35,15 +36,20 @@ const Page = () => {
 
   return (
     <>
+      <StatusBar
+        backgroundColor={settings.theme === "light" ? COLORS.main : COLORS.dark}
+      />
       <Stack.Screen
         options={{
           headerStyle: {
-            backgroundColor: COLORS.main,
+            backgroundColor:
+              settings.theme === "light" ? COLORS.main : COLORS.dark,
           },
           headerTitle: data.book.concat(` ${data.chapterNumber}`),
           headerTitleStyle: {
             fontFamily: FONTS.bold,
             fontSize: 20,
+            color: settings.theme === "dark" ? COLORS.white : COLORS.black,
           },
           headerShadowVisible: false,
           headerLeft: () => (
@@ -61,7 +67,13 @@ const Page = () => {
                 router.back();
               }}
             >
-              <Ionicons name="arrow-back" size={20} color={COLORS.tertiary} />
+              <Ionicons
+                name="arrow-back"
+                size={20}
+                color={
+                  settings.theme === "dark" ? COLORS.white : COLORS.tertiary
+                }
+              />
             </TouchableOpacity>
           ),
           headerRight: () => (
@@ -82,18 +94,29 @@ const Page = () => {
               <Ionicons
                 name="ellipsis-vertical-outline"
                 size={20}
-                color={COLORS.tertiary}
+                color={
+                  settings.theme === "dark" ? COLORS.white : COLORS.tertiary
+                }
               />
             </TouchableOpacity>
           ),
         }}
       />
-      <ChapterOptionsBottomSheet ref={chapterBottomSheetRef} />
+      <ChapterOptionsBottomSheet
+        ref={chapterBottomSheetRef}
+        chapter={{
+          abbr: data.abbr,
+          chapterNumber: data.chapterNumber,
+          name: data.book,
+        }}
+      />
+
       <FlatList
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 100 }}
         style={{
-          backgroundColor: COLORS.main,
+          backgroundColor:
+            settings.theme === "light" ? COLORS.main : COLORS.dark,
         }}
         data={data.verses}
         keyExtractor={(_, i) => i.toString()}

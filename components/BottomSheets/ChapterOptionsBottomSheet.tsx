@@ -1,23 +1,56 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import { COLORS, FONTS } from "@/constants";
 import {
   BottomSheetModal,
   BottomSheetBackdrop,
   BottomSheetView,
-  BottomSheetScrollView,
+  useBottomSheetModal,
 } from "@gorhom/bottom-sheet";
 import Card from "../Card";
-import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
+
+import {
+  FontSizeComponent,
+  FontWeightComponent,
+  FontStyleComponent,
+} from "../FontStyles";
+import { ReadingBrightnessComponent } from "../ReadingBrightness";
+import { ReadingThemeComponent } from "../ReadingTheme";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { useReaderLaterStore } from "@/store/useReadLaterStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { onImpact } from "@/utils";
-import { TFontSize } from "@/types";
 
-interface Props {}
+interface Props {
+  chapter: { abbr: string; name: string; chapterNumber: number };
+}
 const ChapterOptionsBottomSheet = React.forwardRef<BottomSheetModal, Props>(
-  ({}, ref) => {
-    const snapPoints = React.useMemo(() => ["50%"], []);
-    const { settings, update } = useSettingsStore();
+  ({ chapter }, ref) => {
+    const snapPoints = React.useMemo(() => ["80%"], []);
+
+    const [readLater, setReadLater] = React.useState(false);
+    const { chapters, add, remove } = useReaderLaterStore();
+    const { settings } = useSettingsStore();
+    const { dismiss } = useBottomSheetModal();
+
+    const addToReadLater = async () => {
+      if (settings.haptics) await onImpact();
+      add(chapter);
+      dismiss();
+    };
+    const removeFromReadLater = async () => {
+      if (settings.haptics) await onImpact();
+      remove(chapter);
+      dismiss();
+    };
+
+    React.useEffect(() => {
+      const found = !!chapters.find(
+        (c) =>
+          c.abbr === chapter.abbr && c.chapterNumber === chapter.chapterNumber
+      );
+      setReadLater(found);
+    }, [chapters]);
 
     return (
       <BottomSheetModal
@@ -25,6 +58,7 @@ const ChapterOptionsBottomSheet = React.forwardRef<BottomSheetModal, Props>(
         snapPoints={snapPoints}
         index={0}
         enablePanDownToClose={true}
+        enableContentPanningGesture={false}
         enableOverDrag={false}
         backgroundStyle={{
           backgroundColor: COLORS.main,
@@ -41,7 +75,7 @@ const ChapterOptionsBottomSheet = React.forwardRef<BottomSheetModal, Props>(
             style={{
               alignSelf: "center",
               backgroundColor: COLORS.tertiary,
-              width: 100,
+              width: 130,
               justifyContent: "center",
               alignItems: "center",
               borderRadius: 999,
@@ -62,56 +96,188 @@ const ChapterOptionsBottomSheet = React.forwardRef<BottomSheetModal, Props>(
                 color: COLORS.white,
               }}
             >
-              Options
+              Chapter Options
             </Text>
           </View>
         )}
       >
         <BottomSheetView style={{ flex: 1, padding: 10 }}>
-          <View style={{ marginTop: 20 }}>
-            <Text style={{ fontFamily: FONTS.bold, fontSize: 20 }}>
-              Reading Font
+          <Card
+            style={{
+              marginTop: 40,
+              position: "relative",
+            }}
+          >
+            <View
+              style={{
+                position: "absolute",
+                height: 30,
+                backgroundColor: COLORS.primary,
+                top: -15,
+                width: 100,
+                alignItems: "center",
+                borderRadius: 5,
+              }}
+            >
+              <Text style={{ fontFamily: FONTS.bold, fontSize: 18 }}>Font</Text>
+            </View>
+
+            <Text
+              style={{
+                fontFamily: FONTS.regular,
+                marginTop: 10,
+              }}
+            >
+              Change Reading Font Size
             </Text>
-          </View>
-          <View style={{ flexDirection: "row", gap: 5 }}>
-            {["xsmall", "small", "normal", "medium", "large", "xlarge"].map(
-              (item) => (
-                <TouchableOpacity
-                  onPress={async () => {
-                    if (settings.haptics) await onImpact();
-                    update({
-                      ...settings,
-                      fontSize: item as TFontSize,
-                    });
-                  }}
-                  style={[
-                    styles.item,
-                    {
-                      backgroundColor:
-                        item === settings.fontSize
-                          ? COLORS.tertiary
-                          : COLORS.main,
-                    },
-                  ]}
-                  key={item}
-                >
-                  <Text
-                    style={[
-                      styles.item_text,
-                      {
-                        color:
-                          item === settings.fontSize
-                            ? COLORS.white
-                            : COLORS.black,
-                      },
-                    ]}
-                  >
-                    {item}
-                  </Text>
-                </TouchableOpacity>
-              )
-            )}
-          </View>
+            <FontSizeComponent />
+            <Text
+              style={{
+                fontFamily: FONTS.regular,
+                marginTop: 10,
+              }}
+            >
+              Change Reading Font Weight
+            </Text>
+            <FontWeightComponent />
+            <Text
+              style={{
+                fontFamily: FONTS.regular,
+                marginTop: 10,
+              }}
+            >
+              Change Reading Font Style
+            </Text>
+            <FontStyleComponent />
+          </Card>
+
+          <Card
+            style={{
+              marginTop: 20,
+              position: "relative",
+            }}
+          >
+            <View
+              style={{
+                position: "absolute",
+                height: 30,
+                backgroundColor: COLORS.primary,
+                top: -15,
+                width: 100,
+                alignItems: "center",
+                borderRadius: 5,
+              }}
+            >
+              <Text style={{ fontFamily: FONTS.bold, fontSize: 18 }}>
+                Brightness
+              </Text>
+            </View>
+            <Text
+              style={{
+                fontFamily: FONTS.regular,
+                marginTop: 10,
+              }}
+            >
+              Change Reading Brightness
+            </Text>
+            <ReadingBrightnessComponent />
+          </Card>
+
+          <Card
+            style={{
+              marginTop: 20,
+              position: "relative",
+            }}
+          >
+            <View
+              style={{
+                position: "absolute",
+                height: 30,
+                backgroundColor: COLORS.primary,
+                top: -15,
+                width: 150,
+                alignItems: "center",
+                borderRadius: 5,
+              }}
+            >
+              <Text style={{ fontFamily: FONTS.bold, fontSize: 18 }}>
+                Theme & Keep Awake
+              </Text>
+            </View>
+            <Text
+              style={{
+                fontFamily: FONTS.regular,
+                marginTop: 10,
+              }}
+            >
+              Change Reading Theme
+            </Text>
+            <ReadingThemeComponent />
+          </Card>
+
+          {!readLater ? (
+            <TouchableOpacity
+              onPress={addToReadLater}
+              style={{
+                width: "100%",
+                gap: 10,
+                flexDirection: "row",
+                backgroundColor: COLORS.tertiary,
+                padding: 10,
+                marginBottom: 3,
+                borderRadius: 5,
+                paddingHorizontal: 20,
+                alignItems: "center",
+                marginTop: 20,
+              }}
+            >
+              <MaterialIcons
+                name="bookmark-add"
+                size={24}
+                color={COLORS.white}
+              />
+              <Text
+                style={{
+                  fontFamily: FONTS.bold,
+                  color: COLORS.white,
+                  fontSize: 16,
+                }}
+              >
+                Add Chapter to "Read Later"
+              </Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              onPress={removeFromReadLater}
+              style={{
+                width: "100%",
+                gap: 10,
+                flexDirection: "row",
+                backgroundColor: COLORS.tertiary,
+                marginBottom: 3,
+                borderRadius: 5,
+                padding: 10,
+                paddingHorizontal: 20,
+                alignItems: "center",
+                marginTop: 20,
+              }}
+            >
+              <MaterialIcons
+                name="bookmark-remove"
+                size={24}
+                color={COLORS.white}
+              />
+              <Text
+                style={{
+                  fontFamily: FONTS.bold,
+                  color: COLORS.white,
+                  fontSize: 16,
+                }}
+              >
+                Remove Chapter from "Read Later"
+              </Text>
+            </TouchableOpacity>
+          )}
         </BottomSheetView>
       </BottomSheetModal>
     );
@@ -119,19 +285,3 @@ const ChapterOptionsBottomSheet = React.forwardRef<BottomSheetModal, Props>(
 );
 
 export default ChapterOptionsBottomSheet;
-
-const styles = StyleSheet.create({
-  item: {
-    minWidth: 60,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: COLORS.tertiary,
-    alignItems: "center",
-    padding: 3,
-    borderRadius: 5,
-    flex: 1,
-    maxWidth: 80,
-  },
-  item_text: {
-    fontFamily: FONTS.bold,
-  },
-});

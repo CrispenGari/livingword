@@ -13,6 +13,7 @@ export const COLORS = {
   black: "#000000",
   white: "#ffffff",
   gray: "#8E9598",
+  dark: "#243642",
 };
 
 export const Fonts = {

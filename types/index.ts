@@ -12,6 +12,9 @@ export type TFontSize =
   | "xlarge"
   | "xsmall";
 
+export type TFontStyle = "normalStyle" | "italicStyle";
+export type TFontWeight = "normalWeight" | "boldWeight";
+
 export type TTheme = "dark" | "light";
 export type TSettings = {
   haptics: boolean;
@@ -21,6 +24,8 @@ export type TSettings = {
   keepAwake: boolean;
   brightness: number;
   theme: TTheme;
+  fontWeight: TFontWeight;
+  fontStyle: TFontStyle;
 };
 
 export type TVerse = {

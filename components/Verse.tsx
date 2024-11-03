@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { Text, TouchableOpacity, StyleSheet } from "react-native";
 import React from "react";
 import { COLORS, FONTS } from "@/constants";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
@@ -49,18 +49,27 @@ const Verse = ({
         }}
       >
         <Text
-          selectable
-          selectionColor={COLORS.tertiary}
-          style={{ fontFamily: FONTS.regular }}
-        ></Text>
-
-        <Text
           selectionColor={COLORS.tertiary}
           selectable
-          style={{
-            fontFamily: FONTS.regular,
-            flex: 1,
-          }}
+          style={[
+            {
+              fontFamily: FONTS.regular,
+              flex: 1,
+              color: settings.theme === "light" ? COLORS.black : COLORS.white,
+            },
+            styles[settings.fontSize],
+            {
+              fontFamily:
+                settings.fontWeight === "boldWeight" &&
+                settings.fontStyle === "italicStyle"
+                  ? FONTS.boldItalic
+                  : settings.fontStyle === "italicStyle"
+                  ? FONTS.italic
+                  : settings.fontWeight === "boldWeight"
+                  ? FONTS.bold
+                  : FONTS.regular,
+            },
+          ]}
         >
           {verseNumber}. {verse}
         </Text>
@@ -70,3 +79,14 @@ const Verse = ({
 };
 
 export default Verse;
+
+const styles = StyleSheet.create({
+  xsmall: {},
+  small: {
+    fontSize: 16,
+  },
+  normal: { fontSize: 20 },
+  medium: { fontSize: 24 },
+  large: { fontSize: 28 },
+  xlarge: { fontSize: 32 },
+});

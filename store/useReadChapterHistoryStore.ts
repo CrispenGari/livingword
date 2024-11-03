@@ -6,15 +6,16 @@ import { STORAGE_NAMES } from "@/constants";
 type TChapter = {
   abbr: string;
   name: string;
+  chapterNumber: number;
 };
-interface TState {
+interface TReadChapterHistoryState {
   chapters: TChapter[];
   add: (chapter: TChapter) => void;
   remove: (chapter: TChapter) => void;
   clear: () => void;
 }
 
-export const useReaderLater = create<TState>()(
+export const useReadChapterHistoryStore = create<TReadChapterHistoryState>()(
   persist(
     (set, _get) => ({
       chapters: [],
@@ -28,7 +29,7 @@ export const useReaderLater = create<TState>()(
         }),
     }),
     {
-      name: STORAGE_NAMES.READ_LATER,
+      name: STORAGE_NAMES.READ,
       storage: createJSONStorage(() => zustandStorage),
     }
   )

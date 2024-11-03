@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
+import { ScrollView, TouchableOpacity } from "react-native";
 import React from "react";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { BIBLE, COLORS, FONTS } from "@/constants";
