@@ -68,6 +68,7 @@ const Page = () => {
             nVerses={chapter.length}
             chapter={chapter}
             book={book.name}
+            abbr={book.abbrev}
           />
         ))}
       </ScrollView>

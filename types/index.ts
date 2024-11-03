@@ -22,3 +22,10 @@ export type TSettings = {
   brightness: number;
   theme: TTheme;
 };
+
+export type TVerse = {
+  abbr: string;
+  chapterNumber: number;
+  name: string;
+  verseNumber: number;
+};

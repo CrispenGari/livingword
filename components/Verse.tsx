@@ -1,53 +1,71 @@
-import { View, Text } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import React from "react";
-import { FONTS } from "@/constants";
+import { COLORS, FONTS } from "@/constants";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import VerseOptionsBottomSheet from "./BottomSheets/VerseOptionsBottomSheet";
+import { useSettingsStore } from "@/store/useSettingsStore";
+import { onImpact } from "@/utils";
 
 const Verse = ({
   verseNumber,
   verse,
+  abbr,
+  chapterNumber,
+  chapterName,
 }: {
   verse: string;
   verseNumber: number;
+  abbr: string;
+  chapterNumber: number;
+  chapterName: string;
 }) => {
-  const firstChar = verse.charAt(0);
-  const rest = verse.slice(1);
+  const verseOptionsRef = React.useRef<BottomSheetModal>(null);
+  const { settings } = useSettingsStore();
+
   return (
-    <View
-      style={{
-        alignItems: "flex-start",
-        flexDirection: "row",
-        gap: 10,
-        paddingHorizontal: 10,
-      }}
-    >
-      <Text style={{ fontFamily: FONTS.regular }}>{verseNumber}.</Text>
-      <View
+    <>
+      <VerseOptionsBottomSheet
+        verse={{
+          abbr,
+          chapterNumber,
+          name: chapterName,
+          verseNumber,
+          verse,
+        }}
+        ref={verseOptionsRef}
+      />
+      <TouchableOpacity
         style={{
-          flexDirection: "row",
           alignItems: "flex-start",
-          flex: 1,
+          flexDirection: "row",
+          gap: 10,
+          paddingHorizontal: 10,
+        }}
+        onPress={async () => {
+          if (settings.haptics) {
+            await onImpact();
+          }
+          verseOptionsRef.current?.present();
         }}
       >
         <Text
-          style={{
-            fontFamily: FONTS.bold,
+          selectable
+          selectionColor={COLORS.tertiary}
+          style={{ fontFamily: FONTS.regular }}
+        ></Text>
 
-            flexWrap: "wrap",
-          }}
-        >
-          {firstChar}
-        </Text>
         <Text
+          selectionColor={COLORS.tertiary}
+          selectable
           style={{
             fontFamily: FONTS.regular,
-
             flex: 1,
           }}
         >
-          {rest}
+          {verseNumber}. {verse}
         </Text>
-      </View>
-    </View>
+      </TouchableOpacity>
+    </>
   );
 };
 

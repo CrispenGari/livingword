@@ -1,4 +1,4 @@
-import { View, Text, FlatList } from "react-native";
+import { FlatList } from "react-native";
 import React from "react";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { COLORS, FONTS } from "@/constants";
@@ -9,17 +9,29 @@ import { useSettingsStore } from "@/store/useSettingsStore";
 import { onImpact } from "@/utils";
 import ChapterOptionsBottomSheet from "@/components/BottomSheets/ChapterOptionsBottomSheet";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import { useReadChapterHistory } from "@/store/useReadChapterHistory";
 
 type TChapter = {
   verses: string[];
   book: string;
   chapterNumber: number;
+  abbr: string;
 };
 const Page = () => {
   const { chapter } = useLocalSearchParams<{ chapter: string }>();
   const data = JSON.parse(chapter) as TChapter;
   const { settings } = useSettingsStore();
   const chapterBottomSheetRef = React.useRef<BottomSheetModal>(null);
+  const [read, setRead] = React.useState(false);
+  const { add: markChapterAsRead, chapters: completed } =
+    useReadChapterHistory();
+
+  React.useEffect(() => {
+    const found = !!completed.find(
+      (c) => c.abbr === data.abbr && c.chapterNumber === data.chapterNumber
+    );
+    setRead(found);
+  }, [completed]);
 
   return (
     <>
@@ -52,7 +64,6 @@ const Page = () => {
               <Ionicons name="arrow-back" size={20} color={COLORS.tertiary} />
             </TouchableOpacity>
           ),
-
           headerRight: () => (
             <TouchableOpacity
               style={{
@@ -65,7 +76,6 @@ const Page = () => {
                 if (settings.haptics) {
                   await onImpact();
                 }
-
                 chapterBottomSheetRef.current?.present();
               }}
             >
@@ -88,8 +98,24 @@ const Page = () => {
         data={data.verses}
         keyExtractor={(_, i) => i.toString()}
         renderItem={({ item, index }) => (
-          <Verse verseNumber={index + 1} verse={item} />
+          <Verse
+            verseNumber={index + 1}
+            verse={item}
+            abbr={data.abbr}
+            chapterName={data.book}
+            chapterNumber={data.chapterNumber}
+          />
         )}
+        onEndReached={({ distanceFromEnd }) => {
+          if (read) return;
+          //  mark as read
+          if (distanceFromEnd === 0)
+            markChapterAsRead({
+              abbr: data.abbr,
+              name: data.book,
+              chapterNumber: data.chapterNumber,
+            });
+        }}
       />
     </>
   );

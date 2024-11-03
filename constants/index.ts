@@ -31,4 +31,7 @@ export const FONTS = {
 
 export const STORAGE_NAMES = {
   SETTINGS: "living-word:settings",
+  READ: "living-word:read",
+  READ_LATER: "living-word:read-read",
+  FAVORITES: "living-word:favorites",
 };

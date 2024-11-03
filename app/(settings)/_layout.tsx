@@ -12,7 +12,6 @@ const Layout = () => {
   return (
     <Stack
       screenOptions={{
-        animation: "none",
         headerShadowVisible: false,
         headerStyle: {
           backgroundColor: COLORS.main,
