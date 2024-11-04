@@ -4,6 +4,12 @@ export interface TBibleBook {
   chapters: string[][];
 }
 
+export type TSearchTerm = {
+  all: string;
+  new: string;
+  old: string;
+};
+
 export type TFontSize =
   | "normal"
   | "medium"

@@ -13,10 +13,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { onImpact } from "@/utils";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useRouter } from "expo-router";
+import { useSearchTermsStore } from "@/store/useSearchTermsStore";
 
 const AllHeader = () => {
   const { top } = useSafeAreaInsets();
   const { settings } = useSettingsStore();
+  const { terms, update } = useSearchTermsStore();
   const router = useRouter();
   return (
     <SafeAreaView
@@ -69,9 +71,11 @@ const AllHeader = () => {
         </View>
 
         <SearchInput
-          text=""
+          text={terms.all}
           placeholder="Search All Books"
-          onChangeText={(text) => {}}
+          onChangeText={(text) => {
+            update({ ...terms, all: text });
+          }}
         />
       </View>
     </SafeAreaView>
