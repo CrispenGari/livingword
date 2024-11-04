@@ -1,4 +1,4 @@
-import { Text, TouchableOpacity, View } from "react-native";
+import { Share, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import { COLORS, FONTS } from "@/constants";
 import {
@@ -15,15 +15,29 @@ import { TVerse } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
 
 interface Props {
-  verse: TVerse & { verse: string };
+  verse: TVerse;
 }
 const VerseOptionsBottomSheet = React.forwardRef<BottomSheetModal, Props>(
   ({ verse }, ref) => {
-    const snapPoints = React.useMemo(() => ["30%"], []);
+    const snapPoints = React.useMemo(() => ["40%"], []);
     const { settings } = useSettingsStore();
     const [favored, setFavored] = React.useState(false);
     const { verses, add, remove } = useFavoritesVersesStore();
     const { dismiss } = useBottomSheetModal();
+
+    const shareVerse = async () => {
+      if (settings.haptics) await onImpact();
+      await Share.share(
+        {
+          message: `${verse.name} ${verse.chapterNumber} vs ${verse.verseNumber}: ${verse.verse}`,
+          title: "Living Word Bible",
+        },
+        {
+          dialogTitle: "Share Living Word Bible Verse",
+          tintColor: COLORS.tertiary,
+        }
+      );
+    };
 
     const addToFavorites = async () => {
       if (settings.haptics) await onImpact();
@@ -32,6 +46,7 @@ const VerseOptionsBottomSheet = React.forwardRef<BottomSheetModal, Props>(
         chapterNumber: verse.chapterNumber,
         name: verse.name,
         verseNumber: verse.verseNumber,
+        verse: verse.verse,
       });
       dismiss();
     };
@@ -42,6 +57,7 @@ const VerseOptionsBottomSheet = React.forwardRef<BottomSheetModal, Props>(
         chapterNumber: verse.chapterNumber,
         name: verse.name,
         verseNumber: verse.verseNumber,
+        verse: verse.verse,
       });
       dismiss();
     };
@@ -197,6 +213,26 @@ const VerseOptionsBottomSheet = React.forwardRef<BottomSheetModal, Props>(
               </Text>
             </TouchableOpacity>
           )}
+
+          <TouchableOpacity
+            onPress={shareVerse}
+            style={{
+              width: "100%",
+              gap: 10,
+              flexDirection: "row",
+              backgroundColor: COLORS.secondary,
+              marginBottom: 3,
+              borderRadius: 5,
+              padding: 10,
+              paddingHorizontal: 20,
+              alignItems: "center",
+            }}
+          >
+            <Ionicons name="share-outline" size={24} color={COLORS.black} />
+            <Text style={{ fontFamily: FONTS.bold }}>
+              Share {verse.name} {verse.chapterNumber} verse {verse.verseNumber}
+            </Text>
+          </TouchableOpacity>
         </BottomSheetView>
       </BottomSheetModal>
     );

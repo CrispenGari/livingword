@@ -14,7 +14,7 @@ import { useSettingsStore } from "@/store/useSettingsStore";
 import * as Constants from "expo-constants";
 import { COLORS, FONTS } from "@/constants";
 import { onImpact, onFetchUpdateAsync, rateApp } from "@/utils";
-import { router, Stack, useRouter } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import Card from "@/components/Card";
 import SettingsItem from "@/components/SettingsItem";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
@@ -302,12 +302,15 @@ const Page = () => {
             onPress={async () => {
               await Share.share(
                 {
-                  url: "https://github.com/CrispenGari/Living Word Bible",
+                  url: "https://github.com/CrispenGari/livingword",
                   message:
-                    "Master of Cocktails: Download at https://github.com/CrispenGari/cocktailer",
-                  title: "Share cocktailer with a Friend",
+                    "English Simplified Bible: Download at https://github.com/CrispenGari/livingword",
+                  title: "Share Living Word Bible with a Friend",
                 },
-                { dialogTitle: "Share cocktailer", tintColor: COLORS.tertiary }
+                {
+                  dialogTitle: "Share Living Word Bible",
+                  tintColor: COLORS.tertiary,
+                }
               );
             }}
             title="Tell a Friend"
@@ -350,6 +353,24 @@ const Page = () => {
         </Card>
         <Text style={styles.headerText}>Misc</Text>
         <Card>
+          <SettingsItem
+            subtitle={
+              settings.notify
+                ? "Living Word Bible Notifications are ONN."
+                : "Living Word Bible Notifications are OFF."
+            }
+            onPress={() => {
+              update({ ...settings, notify: !settings.notify });
+            }}
+            title="App Notifications"
+            Icon={
+              <Ionicons
+                name="notifications-outline"
+                size={18}
+                color={COLORS.black}
+              />
+            }
+          />
           <SettingsItem
             subtitle={
               settings.haptics

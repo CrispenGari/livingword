@@ -33,4 +33,5 @@ export type TVerse = {
   chapterNumber: number;
   name: string;
   verseNumber: number;
+  verse: string;
 };

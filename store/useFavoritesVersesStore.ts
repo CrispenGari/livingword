@@ -17,11 +17,17 @@ export const useFavoritesVersesStore = create<TState>()(
       verses: [],
       clear: () => set({ ..._get(), verses: [] }),
       add: (verse) => set({ ..._get(), verses: [verse, ..._get().verses] }),
-      remove: (verse) =>
-        set({
+      remove: (verse) => {
+        const computed = `${verse.abbr}${verse.chapterNumber}${verse.verseNumber}`;
+        return set({
           ..._get(),
-          verses: [..._get().verses.filter((f) => f.abbr !== verse.abbr)],
-        }),
+          verses: [
+            ..._get().verses.filter(
+              (f) => `${f.abbr}${f.chapterNumber}${f.verseNumber}` !== computed
+            ),
+          ],
+        });
+      },
     }),
     {
       name: STORAGE_NAMES.FAVORITES,

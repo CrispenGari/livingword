@@ -35,4 +35,5 @@ export const STORAGE_NAMES = {
   READ: "living-word:read",
   READ_LATER: "living-word:read-read",
   FAVORITES: "living-word:favorites",
+  VERSE_OF_THE_DAY: "living-word:verse-of-the-day",
 };

@@ -14,6 +14,22 @@ import NewHeader from "@/components/Headers/New";
 import { useBrightnessPermission } from "@/hooks";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import * as Brightness from "expo-brightness";
+import * as Notifications from "expo-notifications";
+import { useNotificationsToken } from "@/hooks/useNotificationsToken/useNotificationsToken";
+import {
+  hasDatePassed,
+  randomizeVerse,
+  scheduleDailyNotification,
+} from "@/utils";
+import { useVerseOfTheDayStore } from "@/store/useVerseOfTheDayStore";
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
 
 LogBox.ignoreLogs;
 LogBox.ignoreAllLogs();
@@ -39,10 +55,38 @@ const InitialLayout = () => {
 };
 
 export default InitialLayout;
+
 const RootLayout = () => {
   const width = 350;
   const { granted } = useBrightnessPermission();
+  const { token } = useNotificationsToken();
   const { update, settings } = useSettingsStore();
+  const { verse, update: updateTodaysVerse } = useVerseOfTheDayStore();
+  const router = useRouter();
+
+  // randomize verses
+  React.useEffect(() => {
+    const today = new Date().toLocaleDateString();
+    if (!!verse.verse) {
+      if (verse.date !== today) {
+        if (hasDatePassed(verse.date, today)) {
+          const data = randomizeVerse();
+          updateTodaysVerse({
+            date: today,
+            triggered: false,
+            verse: data,
+          });
+        }
+      }
+    } else {
+      const data = randomizeVerse();
+      updateTodaysVerse({
+        date: today,
+        triggered: false,
+        verse: data,
+      });
+    }
+  }, [verse]);
 
   React.useEffect(() => {
     (async () => {
@@ -55,6 +99,29 @@ const RootLayout = () => {
       }
     })();
   }, [granted]);
+
+  React.useEffect(() => {
+    if (!!token && settings.notify && verse?.verse) {
+      scheduleDailyNotification({
+        verse: verse.verse,
+      });
+    }
+  }, [token, settings]);
+
+  React.useEffect(() => {
+    const notificationListener = Notifications.addNotificationReceivedListener(
+      (_notification) => {}
+    );
+    const responseListener =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        router.navigate("/(settings)/day");
+      });
+    return () => {
+      Notifications.removeNotificationSubscription(notificationListener);
+      Notifications.removeNotificationSubscription(responseListener);
+    };
+  }, []);
+
   return (
     <>
       <StatusBar backgroundColor={COLORS.main} animated={false} />
