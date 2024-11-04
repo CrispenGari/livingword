@@ -133,7 +133,6 @@ const Page = () => {
         )}
         onEndReached={({ distanceFromEnd }) => {
           if (read) return;
-          //  mark as read
           if (distanceFromEnd === 0)
             markChapterAsRead({
               abbr: data.abbr,

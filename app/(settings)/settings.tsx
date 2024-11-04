@@ -14,7 +14,7 @@ import { useSettingsStore } from "@/store/useSettingsStore";
 import * as Constants from "expo-constants";
 import { COLORS, FONTS } from "@/constants";
 import { onImpact, onFetchUpdateAsync, rateApp } from "@/utils";
-import { router, Stack } from "expo-router";
+import { router, Stack, useRouter } from "expo-router";
 import Card from "@/components/Card";
 import SettingsItem from "@/components/SettingsItem";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
@@ -37,6 +37,7 @@ const Page = () => {
   const keepAwakeSettingsBottomSheetRef = React.useRef<BottomSheetModal>(null);
   const themeSettingsBottomSheetRef = React.useRef<BottomSheetModal>(null);
   const brightnessSettingsBottomSheetRef = React.useRef<BottomSheetModal>(null);
+  const router = useRouter();
 
   return (
     <>
@@ -85,84 +86,6 @@ const Page = () => {
         }}
         showsVerticalScrollIndicator={false}
       >
-        <Text
-          style={{
-            textAlign: "center",
-            color: COLORS.tertiary,
-            fontFamily: FONTS.bold,
-          }}
-        >
-          {Constants.default.expoConfig?.name}{" "}
-          {Constants.default.expoConfig?.version}
-        </Text>
-        <Text style={styles.headerText}>Misc</Text>
-        <Card>
-          <SettingsItem
-            subtitle={
-              settings.haptics
-                ? "In app haptics are ONN."
-                : "In app haptics are OFF."
-            }
-            onPress={() => {
-              update({ ...settings, haptics: !settings.haptics });
-            }}
-            title="App Haptics"
-            Icon={
-              <MaterialIcons name="vibration" size={18} color={COLORS.black} />
-            }
-          />
-          <SettingsItem
-            subtitle="Check for new updates."
-            onPress={async () => {
-              await onFetchUpdateAsync();
-            }}
-            title="Updates"
-            Icon={
-              <MaterialIcons name="update" size={18} color={COLORS.black} />
-            }
-          />
-          <SettingsItem
-            subtitle="Reset settings to default."
-            onPress={() => {
-              Alert.alert(
-                "Resetting Settings to Default",
-                "Are you sure you want to reset the settings to default?",
-                [
-                  {
-                    text: "Yes",
-                    onPress: async () => {
-                      if (settings.haptics) {
-                        onImpact();
-                      }
-                      restoreSettings();
-                      clearReadLater();
-                      clearFavVerses();
-                      clearReadChapters();
-                    },
-                    style: "default",
-                  },
-                  {
-                    text: "No",
-                    style: "cancel",
-                    onPress: async () => {
-                      if (settings.haptics) {
-                        await onImpact();
-                      }
-                    },
-                  },
-                ],
-                {
-                  cancelable: false,
-                }
-              );
-            }}
-            title="Reset Settings"
-            Icon={
-              <Ionicons name="refresh-sharp" size={18} color={COLORS.black} />
-            }
-          />
-        </Card>
-
         <Text style={styles.headerText}>User Reading Preference</Text>
         <Card>
           <SettingsItem
@@ -212,9 +135,9 @@ const Page = () => {
         <Text style={styles.headerText}>Chapters & Verses Management</Text>
         <Card>
           <SettingsItem
-            subtitle="Read Later Chapters."
-            onPress={() => {}}
-            title="Check the chapters that you want to read later."
+            subtitle="Check the chapters that you want to read later."
+            onPress={() => router.navigate("/(settings)/later")}
+            title="Read Later Chapters."
             Icon={
               <Ionicons
                 name="bookmark-outline"
@@ -224,17 +147,17 @@ const Page = () => {
             }
           />
           <SettingsItem
-            subtitle="Verse Of The Day."
-            onPress={() => {}}
-            title="Check the verse of the day."
+            subtitle="Check the verse of the day."
+            onPress={() => router.navigate("/(settings)/day")}
+            title="Verse Of The Day."
             Icon={
               <Ionicons name="book-outline" size={18} color={COLORS.black} />
             }
           />
           <SettingsItem
-            subtitle="Favorite Verses."
-            onPress={() => {}}
-            title="Check your favorite verses."
+            subtitle="Check your favorite verses."
+            onPress={() => router.navigate("/(settings)/favorites")}
+            title="Favorite Verses."
             Icon={<Ionicons name="heart" size={18} color={COLORS.black} />}
           />
           <SettingsItem
@@ -248,7 +171,9 @@ const Page = () => {
                     text: "Yes",
                     onPress: async () => {
                       if (settings.haptics) {
+                        await onImpact();
                       }
+                      clearFavVerses();
                     },
                     style: "default",
                   },
@@ -277,7 +202,7 @@ const Page = () => {
             }
           />
           <SettingsItem
-            subtitle="Clear your read chapter history."
+            subtitle="Clear your Read Chapters history."
             onPress={async () => {
               Alert.alert(
                 "Clearing Read Chapter History",
@@ -287,7 +212,9 @@ const Page = () => {
                     text: "Yes",
                     onPress: async () => {
                       if (settings.haptics) {
+                        await onImpact();
                       }
+                      clearReadChapters();
                     },
                     style: "default",
                   },
@@ -309,6 +236,47 @@ const Page = () => {
             title="Clear Read Chapter History"
             Icon={
               <MaterialIcons name="clear-all" size={18} color={COLORS.black} />
+            }
+          />
+          <SettingsItem
+            subtitle="Clear your Read Later Chapters."
+            onPress={async () => {
+              Alert.alert(
+                "Clearing Read Later Chapter",
+                "Are you sure you want to clear your read later chapters?",
+                [
+                  {
+                    text: "Yes",
+                    onPress: async () => {
+                      if (settings.haptics) {
+                        await onImpact();
+                      }
+                      clearReadLater();
+                    },
+                    style: "default",
+                  },
+                  {
+                    text: "No",
+                    style: "cancel",
+                    onPress: async () => {
+                      if (settings.haptics) {
+                        await onImpact();
+                      }
+                    },
+                  },
+                ],
+                {
+                  cancelable: false,
+                }
+              );
+            }}
+            title="Clear Read Later Chapters"
+            Icon={
+              <MaterialIcons
+                name="bookmark-remove"
+                size={18}
+                color={COLORS.black}
+              />
             }
           />
         </Card>
@@ -380,6 +348,74 @@ const Page = () => {
             subtitle="Report a bug to github."
           />
         </Card>
+        <Text style={styles.headerText}>Misc</Text>
+        <Card>
+          <SettingsItem
+            subtitle={
+              settings.haptics
+                ? "In app haptics are ONN."
+                : "In app haptics are OFF."
+            }
+            onPress={() => {
+              update({ ...settings, haptics: !settings.haptics });
+            }}
+            title="App Haptics"
+            Icon={
+              <MaterialIcons name="vibration" size={18} color={COLORS.black} />
+            }
+          />
+          <SettingsItem
+            subtitle="Check for new updates."
+            onPress={async () => {
+              await onFetchUpdateAsync();
+            }}
+            title="Updates"
+            Icon={
+              <MaterialIcons name="update" size={18} color={COLORS.black} />
+            }
+          />
+          <SettingsItem
+            subtitle="Reset settings to default."
+            onPress={() => {
+              Alert.alert(
+                "Resetting Settings to Default",
+                "Are you sure you want to reset the settings to default?",
+                [
+                  {
+                    text: "Yes",
+                    onPress: async () => {
+                      if (settings.haptics) {
+                        onImpact();
+                      }
+                      restoreSettings();
+                      clearReadLater();
+                      clearFavVerses();
+                      clearReadChapters();
+                    },
+                    style: "default",
+                  },
+                  {
+                    text: "No",
+                    style: "cancel",
+                    onPress: async () => {
+                      if (settings.haptics) {
+                        await onImpact();
+                      }
+                    },
+                  },
+                ],
+                {
+                  cancelable: false,
+                }
+              );
+            }}
+            title="Reset Settings"
+            Icon={
+              <Ionicons name="refresh-sharp" size={18} color={COLORS.black} />
+            }
+          />
+        </Card>
+
         <Text style={styles.headerText}>Legal</Text>
         <Card>
           <SettingsItem
@@ -411,6 +447,18 @@ const Page = () => {
             }
           />
         </Card>
+
+        <Text
+          style={{
+            textAlign: "center",
+            color: COLORS.tertiary,
+            fontFamily: FONTS.bold,
+            marginTop: 30,
+          }}
+        >
+          {Constants.default.expoConfig?.name}{" "}
+          {Constants.default.expoConfig?.version}
+        </Text>
       </ScrollView>
     </>
   );

@@ -1,17 +1,24 @@
 import { ScrollView, TouchableOpacity } from "react-native";
 import React from "react";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import {
+  Stack,
+  useLocalSearchParams,
+  useNavigation,
+  useRouter,
+} from "expo-router";
 import { BIBLE, COLORS, FONTS } from "@/constants";
 import Chapter from "@/components/Chapter";
 import { Ionicons } from "@expo/vector-icons";
 import { onImpact } from "@/utils";
 import { useSettingsStore } from "@/store/useSettingsStore";
+import { StackActions } from "@react-navigation/native";
 
 const Page = () => {
   const router = useRouter();
   const { book: abbrev } = useLocalSearchParams<{ book: string }>();
   const book = BIBLE.find((b) => b.abbrev === abbrev)!;
   const { settings } = useSettingsStore();
+  const navigation = useNavigation();
 
   return (
     <>
@@ -38,7 +45,10 @@ const Page = () => {
                 if (settings.haptics) {
                   await onImpact();
                 }
-                router.replace("/");
+                if (router.canGoBack()) {
+                  navigation.dispatch(StackActions.popToTop());
+                }
+                router.back();
               }}
             >
               <Ionicons name="arrow-back" size={20} color={COLORS.tertiary} />
@@ -69,6 +79,7 @@ const Page = () => {
             chapter={chapter}
             book={book.name}
             abbr={book.abbrev}
+            index={index}
           />
         ))}
       </ScrollView>

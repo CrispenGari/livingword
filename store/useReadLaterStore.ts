@@ -7,6 +7,7 @@ type TChapter = {
   abbr: string;
   name: string;
   chapterNumber: number;
+  verses: string[];
 };
 interface TState {
   chapters: TChapter[];
@@ -22,11 +23,18 @@ export const useReaderLaterStore = create<TState>()(
       clear: () => set({ ..._get(), chapters: [] }),
       add: (chapter) =>
         set({ ..._get(), chapters: [chapter, ..._get().chapters] }),
-      remove: (chapter) =>
-        set({
+      remove: (chapter) => {
+        const computed =
+          `${chapter.abbr}${chapter.chapterNumber}`.toLowerCase();
+        return set({
           ..._get(),
-          chapters: [..._get().chapters.filter((f) => f.abbr !== chapter.abbr)],
-        }),
+          chapters: [
+            ..._get().chapters.filter(
+              (f) => `${f.abbr}${f.chapterNumber}`.toLowerCase() !== computed
+            ),
+          ],
+        });
+      },
     }),
     {
       name: STORAGE_NAMES.READ_LATER,

@@ -22,7 +22,12 @@ import { useSettingsStore } from "@/store/useSettingsStore";
 import { onImpact } from "@/utils";
 
 interface Props {
-  chapter: { abbr: string; name: string; chapterNumber: number };
+  chapter: {
+    abbr: string;
+    name: string;
+    chapterNumber: number;
+    verses: string[];
+  };
 }
 const ChapterOptionsBottomSheet = React.forwardRef<BottomSheetModal, Props>(
   ({ chapter }, ref) => {
