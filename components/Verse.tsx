@@ -12,12 +12,14 @@ const Verse = ({
   abbr,
   chapterNumber,
   chapterName,
+  isReading,
 }: {
   verse: string;
   verseNumber: number;
   abbr: string;
   chapterNumber: number;
   chapterName: string;
+  isReading: boolean;
 }) => {
   const verseOptionsRef = React.useRef<BottomSheetModal>(null);
   const { settings } = useSettingsStore();
@@ -40,6 +42,7 @@ const Verse = ({
           flexDirection: "row",
           gap: 10,
           paddingHorizontal: 10,
+          backgroundColor: isReading ? COLORS.primary : "transparent",
         }}
         onPress={async () => {
           if (settings.haptics) {

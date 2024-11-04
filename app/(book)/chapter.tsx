@@ -1,4 +1,4 @@
-import { FlatList } from "react-native";
+import { FlatList, View } from "react-native";
 import React from "react";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { COLORS, FONTS } from "@/constants";
@@ -6,11 +6,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import Verse from "@/components/Verse";
 import { useSettingsStore } from "@/store/useSettingsStore";
-import { onImpact } from "@/utils";
+import { onImpact, readAloud } from "@/utils";
 import ChapterOptionsBottomSheet from "@/components/BottomSheets/ChapterOptionsBottomSheet";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useReadChapterHistoryStore } from "@/store/useReadChapterHistoryStore";
 import { StatusBar } from "expo-status-bar";
+import * as Speech from "expo-speech";
+import Transcription from "@/components/Transcription";
 
 type TChapter = {
   verses: string[];
@@ -20,10 +22,14 @@ type TChapter = {
 };
 const Page = () => {
   const { chapter } = useLocalSearchParams<{ chapter: string }>();
-  const data = JSON.parse(chapter) as TChapter & { navigateTo?: string };
+  const data = React.useMemo(() => JSON.parse(chapter) as TChapter, []);
   const { settings } = useSettingsStore();
   const chapterBottomSheetRef = React.useRef<BottomSheetModal>(null);
   const [read, setRead] = React.useState(false);
+  const [state, setState] = React.useState({
+    controls: false,
+    verseIndex: -1,
+  });
   const { add: markChapterAsRead, chapters: completed } =
     useReadChapterHistoryStore();
 
@@ -33,6 +39,23 @@ const Page = () => {
     );
     setRead(found);
   }, [completed]);
+
+  React.useEffect(() => {
+    if (state.controls) {
+      readAloud(data.verses[state.verseIndex], {
+        onDone: () => {
+          Speech.stop();
+          if (state.verseIndex + 1 === data.verses.length) {
+            setState((s) => ({ ...s, controls: false, verseIndex: -1 }));
+          }
+          setState((s) => ({ ...s, verseIndex: s.verseIndex + 1 }));
+        },
+        onPause() {},
+        onResume() {},
+        onStopped() {},
+      });
+    }
+  }, [state]);
 
   return (
     <>
@@ -64,7 +87,6 @@ const Page = () => {
                 if (settings.haptics) {
                   await onImpact();
                 }
-
                 router.back();
               }}
             >
@@ -78,28 +100,60 @@ const Page = () => {
             </TouchableOpacity>
           ),
           headerRight: () => (
-            <TouchableOpacity
+            <View
               style={{
-                width: 30,
-                height: 30,
-                justifyContent: "center",
+                flexDirection: "row",
+                gap: 10,
                 alignItems: "center",
               }}
-              onPress={async () => {
-                if (settings.haptics) {
-                  await onImpact();
-                }
-                chapterBottomSheetRef.current?.present();
-              }}
             >
-              <Ionicons
-                name="ellipsis-vertical"
-                size={20}
-                color={
-                  settings.theme === "dark" ? COLORS.white : COLORS.tertiary
-                }
-              />
-            </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  width: 30,
+                  height: 30,
+                  justifyContent: "center",
+                  alignItems: "center",
+
+                  borderRadius: 30,
+                }}
+                onPress={async () => {
+                  if (settings.haptics) {
+                    await onImpact();
+                  }
+                  setState((s) => ({ ...s, controls: true, verseIndex: 0 }));
+                }}
+              >
+                <Ionicons
+                  name="volume-high-outline"
+                  size={24}
+                  color={
+                    settings.theme === "dark" ? COLORS.white : COLORS.tertiary
+                  }
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  width: 30,
+                  height: 30,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+                onPress={async () => {
+                  if (settings.haptics) {
+                    await onImpact();
+                  }
+                  chapterBottomSheetRef.current?.present();
+                }}
+              >
+                <Ionicons
+                  name="ellipsis-vertical"
+                  size={20}
+                  color={
+                    settings.theme === "dark" ? COLORS.white : COLORS.tertiary
+                  }
+                />
+              </TouchableOpacity>
+            </View>
           ),
         }}
       />
@@ -129,6 +183,7 @@ const Page = () => {
             abbr={data.abbr}
             chapterName={data.book}
             chapterNumber={data.chapterNumber}
+            isReading={state.verseIndex === index}
           />
         )}
         onEndReached={({ distanceFromEnd }) => {
@@ -142,6 +197,13 @@ const Page = () => {
             });
         }}
       />
+      {state.controls ? (
+        <Transcription
+          setState={setState}
+          verseIndex={state.verseIndex}
+          verses={data.verses}
+        />
+      ) : null}
     </>
   );
 };

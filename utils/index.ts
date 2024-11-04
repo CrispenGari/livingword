@@ -3,10 +3,41 @@ import * as Haptics from "expo-haptics";
 import * as StoreReview from "expo-store-review";
 import * as Updates from "expo-updates";
 import * as Constants from "expo-constants";
-
+import * as Speech from "expo-speech";
 import * as Notifications from "expo-notifications";
 import { TVerse } from "@/types";
 import { BIBLE } from "@/constants";
+
+export const readAloud = (
+  verse: string,
+
+  {
+    onDone,
+    onStopped,
+    onPause,
+    onResume,
+  }: {
+    onDone: () => void;
+    onStopped: () => void;
+    onResume: () => void;
+    onPause: () => void;
+  }
+) => {
+  Speech.speak(verse, {
+    onDone: () => {
+      onDone();
+    },
+    onStopped: () => {
+      onStopped();
+    },
+    onResume: () => {
+      onResume();
+    },
+    onPause: () => {
+      onPause();
+    },
+  });
+};
 
 export const scheduleDailyNotification = ({ verse }: { verse: TVerse }) => {
   // Schedule the daily notification
